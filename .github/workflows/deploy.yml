@@ -1,50 +1,17 @@
-name: Deploy Dog Vue App
+name: Frontend CI/CD
 
 on:
   push:
     branches: [ "main" ]
-  workflow_dispatch: # รองรับการกดปุ่ม Run workflow แบบ Manual บน GitHub
+  workflow_dispatch:
 
 jobs:
   deploy:
-    name: Deploy to Self-Hosted Docker
     runs-on: self-hosted
-
     steps:
-      - name: 📥 Check out repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: 🐳 Deploy with Docker Compose
+      - name: Deploy container
         shell: powershell
-        run: |
-          Write-Host "กำลังเตรียม Deploy แอปพลิเคชันด้วย Docker..."
-          
-          # หยุดและลบ container เดิม (ถ้ามีอยู่) เพื่อป้องกันชื่อ container ชนกัน
-          $existing = docker ps -a -q -f name=simple-dog-vue-app
-          if ($existing) {
-              Write-Host "พบ container เดิม กำลังหยุดการทำงาน..."
-              docker stop simple-dog-vue-app
-              docker rm simple-dog-vue-app
-          }
-          
-          # สั่ง build image ใหม่และเริ่มรัน container ในโหมด background
-          docker compose up --build -d
-          Write-Host "Docker compose เริ่มทำงานเรียบร้อยแล้ว"
-
-      - name: 🔍 Verify Deployment Health
-        shell: powershell
-        run: |
-          Write-Host "กำลังตรวจสอบสถานะการทำงานของเว็บแอปพลิเคชัน..."
-          Start-Sleep -Seconds 5
-          try {
-              $response = Invoke-WebRequest -Uri "http://localhost:8088" -UseBasicParsing -TimeoutSec 10
-              if ($response.StatusCode -eq 200) {
-                  Write-Host "✅ Deploy สำเร็จ! เข้าใช้งานเว็บได้ที่ http://localhost:8088"
-              } else {
-                  Write-Error "❌ เว็บตอบกลับด้วยรหัส: $($response.StatusCode)"
-                  exit 1
-              }
-          } catch {
-              Write-Error "❌ ไม่สามารถเชื่อมต่อกับ http://localhost:8088 ได้: $_"
-              exit 1
-          }
+        run: docker compose up -d --build
