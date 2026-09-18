@@ -3,7 +3,7 @@
     <div class="card">
       <header class="header">
         <h1>🐶 สุ่มรูปน้องหมา</h1>
-        <p class="subtitle">ตัวอย่างโปรเจกต์ Vue 3 ดึงข้อมูลจาก Dog CEO API อย่างง่าย</p>
+        <p class="subtitle">ตัวอย่างโปรเจกต์ Vue 3 ดึงข้อมูลจาก Dog CEO API อย่างง่ายย</p>
       </header>
 
       <div class="content">
