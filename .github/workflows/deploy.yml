@@ -60,7 +60,6 @@ jobs:
 
             cd /opt/myapp
 
-            # กำหนด -f docker-compose.yml ชัดเจน เพื่อป้องกันไม่ให้ไปเรียก compose.yml เดิมที่ซ้ำกัน
             docker compose -f docker-compose.yml pull
             docker compose -f docker-compose.yml up -d --remove-orphans
 
