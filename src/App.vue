@@ -48,18 +48,7 @@
           </button>
         </div>
       </div>
-      <footer class="footer">
-        Powered by
-        <a href="https://dog.ceo/dog-api/" target="_blank" rel="noopener"
-          >Dog CEO API</a
-        >
-      </footer>
-      <footer class="footer">
-        Powered by
-        <a href="https://dog.ceo/dog-api/" target="_blank" rel="noopener"
-          >Dog CEO API</a
-        >
-      </footer>
+
       <footer class="footer">
         Powered by
         <a href="https://dog.ceo/dog-api/" target="_blank" rel="noopener"
