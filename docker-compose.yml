@@ -1,0 +1,9 @@
+services:
+  dog-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: simple-dog-vue-app
+    ports:
+      - "8088:80"
+    restart: unless-stopped
