@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-
   workflow_dispatch:
 
 permissions:
@@ -29,15 +28,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build Docker image
+      - name: Build and Push Docker image
         run: |
           docker build \
             -t $IMAGE_NAME:latest \
             -t $IMAGE_NAME:${{ github.sha }} \
             .
-
-      - name: Push Docker image
-        run: |
           docker push $IMAGE_NAME:latest
           docker push $IMAGE_NAME:${{ github.sha }}
 
@@ -52,11 +48,29 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-
           script: |
+            mkdir -p /opt/myapp
             cd /opt/myapp
 
-            docker compose pull
-            docker compose up -d
+            # สร้างหรืออัปเดต docker-compose.yml บน VPS ให้ตรงกับ GHCR image เสมอ
+            cat << 'EOF' > docker-compose.yml
+            services:
+              dog-app:
+                image: ghcr.io/popototae/dog.ceo:latest
+                container_name: simple-dog-vue-app
+                ports:
+                  - "80:80"
+                  - "8088:80"
+                restart: unless-stopped
+            EOF
 
+            # ดึง image ล่าสุดและเริ่มรัน container
+            docker compose pull
+            docker compose up -d --remove-orphans
+
+            # เคลียร์ image เก่า
             docker image prune -f
+
+            # แสดงสถานะ container ให้เห็นใน Actions Log
+            echo "=== สถานะ Container บน VPS ==="
+            docker ps -f name=simple-dog-vue-app

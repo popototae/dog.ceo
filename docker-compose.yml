@@ -1,9 +1,11 @@
 services:
   dog-app:
+    image: ghcr.io/popototae/dog.ceo:latest
     build:
       context: .
       dockerfile: Dockerfile
     container_name: simple-dog-vue-app
     ports:
+      - "80:80"
       - "8088:80"
     restart: unless-stopped
