@@ -3,14 +3,14 @@
     <div class="card">
       <header class="header">
         <h1>🐶 สุ่มรูปน้องหมา</h1>
-        <p class="subtitle">ตัวอย่างโปรเจกต์ Vue 3 ดึงข้อมูลจาก Dog CEO API อย่างง่ายย</p>
+        <p class="subtitle">ตัวอย่างโปรเจกต์ Vue 3 ดึงข้อมูลจาก Dog CEO API อย่างง่าย</p>
       </header>
 
       <div class="content">
         <!-- สถานะกำลังโหลด -->
         <div v-if="loading" class="loading-box">
           <div class="spinner"></div>
-          <p>กำลังค้นหาน้องหมา...</p>
+          <p>กำลังค้นหาน้องหมาาาา...</p>
         </div>
 
         <!-- สถานะเกิดข้อผิดพลาด -->
