@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Production build
+dist/
+
+# Environment files
+.env
+.env.*
+
+# Local / OS files
+.DS_Store
+Thumbs.db
+
+# GitHub Self-Hosted Runner
+actions-runner/
