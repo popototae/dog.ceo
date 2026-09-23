@@ -18,6 +18,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+
+  # ==============================
+  # 1. TEST
+  # ==============================
   test:
     runs-on: ubuntu-latest
 
@@ -37,6 +41,10 @@ jobs:
       - name: Run Unit Tests
         run: npm test
 
+
+  # ==============================
+  # 2. BUILD + PUSH + SECURITY SCAN
+  # ==============================
   build:
     needs: test
     runs-on: ubuntu-latest
@@ -44,6 +52,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -55,50 +66,82 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and Push ARM64 image
+      - name: Build and Push Docker image
         uses: docker/build-push-action@v6
         with:
           context: .
-          platforms: linux/arm64
+          platforms: linux/amd64,linux/arm64
           push: true
+
           tags: |
             ${{ env.IMAGE_NAME }}:latest
             ${{ env.IMAGE_NAME }}:${{ github.sha }}
+
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Inspect Docker image
+        run: |
+          docker buildx imagetools inspect \
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@v0.36.0
         env:
           TRIVY_USERNAME: ${{ github.actor }}
           TRIVY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+
         with:
           image-ref: ${{ env.IMAGE_NAME }}:${{ github.sha }}
+
           format: "table"
+
           exit-code: "0"
+
           ignore-unfixed: true
+
           vuln-type: "os,library"
+
           severity: "CRITICAL,HIGH"
 
+
+  # ==============================
+  # 3. DEPLOY
+  # ==============================
   deploy:
     needs: build
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v1
+
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
+
           script: |
             set -e
 
+            echo "================================"
+            echo "Deploying application"
+            echo "================================"
+
             cd /opt/myapp
 
+            echo "Pulling latest Docker image..."
             docker compose -f compose.yml pull
+
+            echo "Starting containers..."
             docker compose -f compose.yml up -d --remove-orphans
 
+            echo "Removing unused Docker images..."
             docker image prune -f
+
+            echo "================================"
+            echo "Running containers"
+            echo "================================"
 
             docker ps
