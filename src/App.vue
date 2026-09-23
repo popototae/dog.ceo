@@ -61,32 +61,12 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
+import { extractBreed } from "./utils/dog.js";
 
 const imageUrl = ref("");
 const breedName = ref("");
 const loading = ref(false);
 const error = ref("");
-
-// ฟังก์ชันแกะชื่อสายพันธุ์จาก URL ของ Dog CEO API
-const extractBreed = (url) => {
-  try {
-    const parts = url.split("/breeds/")[1];
-    if (!parts) return "";
-    const breedSlug = parts.split("/")[0];
-    // แปลง sub-breed หรือชื่อ เช่น "hound-afghan" -> "Afghan Hound"
-    const subParts = breedSlug.split("-");
-    if (subParts.length > 1) {
-      return `${capitalize(subParts[1])} ${capitalize(subParts[0])}`;
-    }
-    return capitalize(breedSlug);
-  } catch {
-    return "";
-  }
-};
-
-const capitalize = (str) => {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-};
 
 // ฟังก์ชันดึงรูปสุนัขจาก Dog CEO API
 const fetchDogImage = async () => {
